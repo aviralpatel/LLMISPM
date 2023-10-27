@@ -1,3 +1,4 @@
+import os
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -5,10 +6,13 @@ import matplotlib.pyplot as plt
 import datetime as dt
 
 from sklearn.preprocessing import MinMaxScaler
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, LSTM
 
-from keys import newsAPIKey
+print("Number of logical cores: ", os.cpu_count())
+print("Num CPUs Available: ", len(tf.config.experimental.list_physical_devices('CPU')))
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 
 # load data
 ticker = "AAPL"
@@ -17,14 +21,8 @@ start = dt.datetime(2012, 1, 1)
 end = dt.datetime(2019, 1, 1)
 
 data = yf.Ticker(ticker).history(start=start, end=end)
-dict_data = data.to_dict()
 
-for i in range(0, len(dict_data["Close"])):
-    if day > 365:
-        day = 1
-    dayLst.append(day)
-    day += 1
-
+print(type(data))
 
 # prepare the data
 scaledData = MinMaxScaler(feature_range=(0,1)).fit_transform(data["Close"].values.reshape(-1,1))
@@ -51,6 +49,13 @@ model.add(Dropout(0.2))
 model.add(LSTM(units=50))
 model.add(Dropout(0.2))
 model.add(Dense(units=1))
+
+model.compile(optimizer="adam", loss="mean_squared_error")
+model.fit(x_train, y_train, epochs=25, batch_size=32)
+
+
+
+
 
 
 
