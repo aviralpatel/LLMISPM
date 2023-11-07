@@ -11,6 +11,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, LSTM
+from functools import reduce
 
 print("Number of logical cores: ", os.cpu_count())
 print("Num CPUs Available: ", len(tf.config.experimental.list_physical_devices('CPU')))
@@ -128,6 +129,12 @@ for i in range(0, len(predicted_prices)):
 
 adjusted_predicted_prices = adjusted_predicted_prices[:-2]
 rse2 = rse2[:-2]
+
+rmse1 = reduce(lambda x, y: x + y, predicted_prices)/len(predicted_prices)
+rmse2 = reduce(lambda x, y: x + y, adjusted_predicted_prices)/len(adjusted_predicted_prices)
+
+print(f"predicted prices RMS error - {rmse1}")
+print(f"adjusted prices RMS error - {rmse2}")
 
 # Plot the results
 fig, axes = plt.subplots(2, 2)
